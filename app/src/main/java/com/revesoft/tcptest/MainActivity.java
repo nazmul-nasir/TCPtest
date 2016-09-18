@@ -131,12 +131,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         void clientRoutine() throws Exception {
             Socket clientSocket = null;
-            clientSocket = new Socket("192.168.30.202", 30000);
-            OutputStream os = clientSocket.getOutputStream();
-            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            int port =30000;
 
-            clientSocket.setTcpNoDelay(true);
-            for (int j = 1; j <50 ; j++) {
+            for (int j = 0; j <1000 ; j++) {
+                int n=(j/16);
+                clientSocket = new Socket("72.249.184.143", port+n);
+                OutputStream os = clientSocket.getOutputStream();
+                BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+                clientSocket.setTcpNoDelay(true);
             //    os.write(hexStringToByteArray("0x23,0x23,0x23,0x23"));
                // os.write(0x23);
                /* os.write(0x23);
@@ -154,20 +157,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 byte[] arr3= concatenateByteArrays(arr1,arr2);
                 byte [] arr4 = "Sample text from Nasir's Mobile".getBytes();
                 byte [] arr5 = concatenateByteArrays(arr3,arr4);
-                byte arr6[]={0x23,0x23,0x23,0x23};
+                byte arr6[]={0x23,0x23,0x23,0x23,'\n'};
                 byte [] string = concatenateByteArrays(arr5,arr6);
                 os.write(string);
 
                 os.flush();
 
-
-
-
-                modifiedSentence = String.valueOf(inFromServer.read());
-                if (modifiedSentence == null)
-                    Log.i("Reply: ", "NULL");
-                else
-                    Log.i("Reply",modifiedSentence);
+                if (inFromServer.ready()) {
+                    if (inFromServer.readLine() != null) {
+                        modifiedSentence = inFromServer.readLine();
+                        Log.i("Reply", modifiedSentence);
+                    } else
+                        Log.i("Reply", "Null");
+                }
 
                 Thread.sleep(1000);
                /* os.write(("abcde: " + 2).getBytes());
@@ -178,10 +180,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 os.flush();
                 os.write(("abcde: " + 5).getBytes());
                 os.flush();*/
+
+//               clientSocket.close();
             }
 
+             clientSocket.close();
+
             //  outToServer.close();
-            clientSocket.close();
+
         }
 
 
